@@ -30,3 +30,22 @@
 - Retries + DLQ
 - Observability (logs + metrics)
 - Revocation Saga
+
+## Commit slicing examples (portfolio quality)
+
+- **Ingestion feature**
+	1. `feat(contracts): add canonical import event envelope`
+	2. `feat(ingestion): translate whatsapp export to canonical event`
+	3. `test(ingestion): cover translator idempotency and malformed payload`
+	4. `docs(architecture): document translator routing decisions`
+
+- **Schema + API feature**
+	1. `feat(db): add person_identity table and constraints`
+	2. `feat(api): expose person identity endpoints`
+	3. `test(api): add integration coverage for identity CRUD`
+	4. `docs(data-model): update identity mapping and examples`
+
+- **Privacy fix**
+	1. `fix(sharing): prevent linkedin-derived facts from share payloads`
+	2. `test(sharing): add policy regression tests for restricted sources`
+	3. `docs(privacy): clarify blocked-source behavior`

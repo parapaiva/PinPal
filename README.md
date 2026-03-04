@@ -46,16 +46,78 @@ This means:
 
 | Component | Technology | Role |
 |-----------|-----------|------|
-| Relational store | PostgreSQL | Profiles, identities, memberships, relationships |
-| Document store | MongoDB | Raw imports, notes, timelines, audit evidence |
+| API | FastAPI | Async REST API |
+| Relational store | PostgreSQL 16 | Profiles, identities, memberships, relationships |
+| Document store | MongoDB 7 | Raw imports, notes, timelines, audit evidence |
+| Postgres driver | asyncpg + SQLAlchemy 2 | Async ORM and raw queries |
+| Mongo driver | Motor | Async MongoDB client |
+| Migrations | Alembic (async) | Schema versioning |
+| Config | pydantic-settings | Type-safe env var parsing |
+| Logging | structlog | JSON structured logging |
 | Pipeline | Event-driven with EIP patterns | Ingestion, normalization, routing, compensation |
+
+## Development
+
+### Prerequisites
+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (package manager)
+- Docker & Docker Compose
+
+### Quickstart
+
+```bash
+# Install dependencies
+make install
+
+# Start Postgres + MongoDB
+make up
+
+# Run the dev server (http://localhost:8000)
+make dev
+
+# Verify everything works
+curl localhost:8000/healthz
+```
+
+### Available commands
+
+```
+make help            Show all commands
+make install         Install dependencies (dev included)
+make up              Start Postgres + MongoDB containers
+make down            Stop containers
+make dev             Start FastAPI dev server
+make lint            Run ruff linter + mypy type checker
+make format          Auto-format code with ruff
+make typecheck       Run mypy
+make test            Run all tests (requires Docker services)
+make test-unit       Run unit tests only (no Docker needed)
+make test-integration Run integration tests only
+make migrate         Run Alembic migrations
+make logs            Tail container logs
+```
+
+## Commit & PR workflow
+
+PinPal is a portfolio project, so commit history should clearly show engineering decision quality.
+
+- Follow Conventional Commits: `type(scope): summary` (e.g., `feat(router): add content-based route for import events`).
+- Keep commits reviewable; split unrelated concerns when useful (code, tests, docs).
+- For architecture or behavior changes, include docs/ADR updates in the same PR.
+- For schema changes, include Alembic migration files in the same PR.
+- Before opening a PR, run:
+
+```bash
+make lint
+make test
+```
 
 ## Status & Roadmap
 
-PinPal is in **early design and planning**. There is no runnable code yet.
-
 ### Planned milestones
 
+- [x] Project scaffold (dev tooling, Docker Compose, health check)
 - [ ] Schema design (Postgres + MongoDB models)
 - [ ] Ingestion pipeline (first source connector)
 - [ ] Identity resolution engine

@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - run: uv sync --all-extras
+      - run: uv run ruff check src tests
+      - run: uv run ruff format --check src tests
+      - run: uv run mypy src
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pinpal
+          POSTGRES_PASSWORD: pinpal
+          POSTGRES_DB: pinpal
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pinpal"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+      mongo:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: pinpal
+          MONGO_INITDB_ROOT_PASSWORD: pinpal
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping:1})' --quiet"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - run: uv sync --all-extras
+      - run: uv run pytest --cov=pinpal --cov-report=term-missing

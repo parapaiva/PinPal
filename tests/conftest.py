@@ -1,6 +1,7 @@
 """Shared test fixtures."""
 
 import pytest
+from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
 from pinpal.api.app import create_app
@@ -22,8 +23,9 @@ def app(settings: Settings):
 @pytest.fixture
 async def client(app) -> AsyncClient:  # type: ignore[type-arg]
     """Async HTTP client wired to the FastAPI app."""
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    ) as ac:
-        yield ac
+    async with LifespanManager(app) as manager:
+        async with AsyncClient(
+            transport=ASGITransport(app=manager.app),
+            base_url="http://test",
+        ) as ac:
+            yield ac

@@ -6,6 +6,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from pinpal.api.health import router as health_router
+from pinpal.api.routers import (
+    groups_router,
+    persons_router,
+    relationships_router,
+    users_router,
+)
 from pinpal.config import Settings
 from pinpal.db.session import create_engine, create_session_factory
 from pinpal.logging import setup_logging
@@ -45,5 +51,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
 
     app.include_router(health_router)
+    app.include_router(users_router)
+    app.include_router(persons_router)
+    app.include_router(groups_router)
+    app.include_router(relationships_router)
 
     return app

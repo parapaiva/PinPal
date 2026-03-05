@@ -6,6 +6,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
+import pinpal.db.models  # noqa: F401 — register models with Base.metadata
 from pinpal.config import Settings
 from pinpal.db.base import Base
 

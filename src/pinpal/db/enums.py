@@ -45,3 +45,25 @@ class GroupType(enum.StrEnum):
 class SourceAccountStatus(enum.StrEnum):
     ACTIVE = "active"
     REVOKED = "revoked"
+
+
+class FactType(enum.StrEnum):
+    MEMBERSHIP_OBSERVED = "membership_observed"
+    FOLLOW_OBSERVED = "follow_observed"
+    IDENTITY_LINKED = "identity_linked"
+    MANUAL_NOTE = "manual_note"
+
+
+class FactStatus(enum.StrEnum):
+    ACTIVE = "active"
+    RETRACTED = "retracted"
+
+
+class TimelineEventType(enum.StrEnum):
+    EVIDENCE_ADDED = "evidence_added"
+    FACT_RECORDED = "fact_recorded"
+    FACT_RETRACTED = "fact_retracted"
+    MEMBERSHIP_OBSERVED = "membership_observed"
+    RELATIONSHIP_SUGGESTED = "relationship_suggested"
+    RELATIONSHIP_CONFIRMED = "relationship_confirmed"
+    IDENTITY_LINKED = "identity_linked"

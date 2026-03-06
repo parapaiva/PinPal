@@ -6,6 +6,8 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from pinpal.db.enums import (
+    FactStatus,
+    FactType,
     GroupType,
     RelationshipStatus,
     RelationshipType,
@@ -180,6 +182,48 @@ class RelationshipUpdate(BaseModel):
     confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
+# ---- Fact ----
+
+
+class FactCreate(BaseModel):
+    fact_type: FactType
+    source_type: SourceType
+    payload: dict = Field(default_factory=dict)  # type: ignore[type-arg]
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    observed_at: datetime
+    visibility: Visibility = Visibility.PRIVATE
+    evidence_ref: str | None = None
+    person_id: UUID | None = None
+    group_id: UUID | None = None
+    relationship_id: UUID | None = None
+
+
+class FactRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    owner_user_id: UUID
+    fact_type: FactType
+    source_type: SourceType
+    payload: dict  # type: ignore[type-arg]
+    confidence: float | None
+    observed_at: datetime
+    visibility: Visibility
+    evidence_ref: str | None
+    person_id: UUID | None
+    group_id: UUID | None
+    relationship_id: UUID | None
+    status: FactStatus
+    retracted_at: datetime | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class FactUpdate(BaseModel):
+    visibility: Visibility | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+
+
 # ---- WhyDoIKnow ----
 
 
@@ -192,6 +236,7 @@ class WhyReasonSchema(BaseModel):
     identity_id: UUID | None = None
     first_seen_at: datetime | None = None
     evidence_ref: str | None = None
+    fact_id: UUID | None = None
 
 
 class WhyResultSchema(BaseModel):

@@ -111,6 +111,7 @@ async def why_do_i_know(user_id: UUID, person_id: UUID, session: DbSession) -> W
                 "identity_id": r.identity_id,
                 "first_seen_at": r.first_seen_at,
                 "evidence_ref": r.evidence_ref,
+                "fact_id": r.fact_id,
             }
             for r in result.reasons
         ],

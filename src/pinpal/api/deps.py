@@ -3,6 +3,7 @@
 from collections.abc import AsyncIterator
 
 from fastapi import Request
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -16,3 +17,8 @@ async def get_db_session(request: Request) -> AsyncIterator[AsyncSession]:
         except Exception:
             await session.rollback()
             raise
+
+
+async def get_mongo_db(request: Request) -> AsyncIOMotorDatabase:  # type: ignore[type-arg]
+    """Return the Motor database handle from app state."""
+    return request.app.state.mongo_db  # type: ignore[no-any-return]

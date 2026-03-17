@@ -27,9 +27,7 @@ MongoDB = Annotated[AsyncIOMotorDatabase, Depends(get_mongo_db)]  # type: ignore
 
 
 @router.post("/raw-payloads", response_model=RawPayloadRead, status_code=201)
-async def store_raw_payload(
-    user_id: UUID, body: RawPayloadCreate, db: MongoDB
-) -> RawPayloadRead:
+async def store_raw_payload(user_id: UUID, body: RawPayloadCreate, db: MongoDB) -> RawPayloadRead:
     body.owner_user_id = str(user_id)
     repo = RawPayloadRepo(db)
     return await repo.insert(body)
@@ -53,9 +51,7 @@ async def list_raw_payloads(
 
 
 @router.get("/raw-payloads/{payload_id}", response_model=RawPayloadRead)
-async def get_raw_payload(
-    user_id: UUID, payload_id: str, db: MongoDB
-) -> RawPayloadRead:
+async def get_raw_payload(user_id: UUID, payload_id: str, db: MongoDB) -> RawPayloadRead:
     repo = RawPayloadRepo(db)
     result = await repo.get(payload_id)
     if result is None or result.owner_user_id != str(user_id):
@@ -93,9 +89,7 @@ async def list_observations(
 
 
 @router.get("/observations/{observation_id}", response_model=ObservationRead)
-async def get_observation(
-    user_id: UUID, observation_id: str, db: MongoDB
-) -> ObservationRead:
+async def get_observation(user_id: UUID, observation_id: str, db: MongoDB) -> ObservationRead:
     repo = ObservationRepo(db)
     result = await repo.get(observation_id)
     if result is None or result.owner_user_id != str(user_id):
@@ -133,9 +127,7 @@ async def list_bundles(
 
 
 @router.get("/bundles/{bundle_id}", response_model=EvidenceBundleRead)
-async def get_bundle(
-    user_id: UUID, bundle_id: str, db: MongoDB
-) -> EvidenceBundleRead:
+async def get_bundle(user_id: UUID, bundle_id: str, db: MongoDB) -> EvidenceBundleRead:
     repo = EvidenceBundleRepo(db)
     result = await repo.get(bundle_id)
     if result is None or result.owner_user_id != str(user_id):

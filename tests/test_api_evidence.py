@@ -29,9 +29,7 @@ async def person_id(client: AsyncClient, user_id: uuid.UUID) -> uuid.UUID:
 
 
 class TestRawPayloads:
-    async def test_store_and_get(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_store_and_get(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         resp = await client.post(
             f"/api/v1/users/{user_id}/evidence/raw-payloads",
             json={
@@ -46,15 +44,11 @@ class TestRawPayloads:
         assert data["source_type"] == "whatsapp"
         payload_id = data["id"]
 
-        get_resp = await client.get(
-            f"/api/v1/users/{user_id}/evidence/raw-payloads/{payload_id}"
-        )
+        get_resp = await client.get(f"/api/v1/users/{user_id}/evidence/raw-payloads/{payload_id}")
         assert get_resp.status_code == 200
         assert get_resp.json()["content_hash"] == "sha256:abc123"
 
-    async def test_list_payloads(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_list_payloads(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         for i in range(3):
             await client.post(
                 f"/api/v1/users/{user_id}/evidence/raw-payloads",
@@ -69,9 +63,7 @@ class TestRawPayloads:
         assert resp.status_code == 200
         assert len(resp.json()) == 3
 
-    async def test_get_not_found(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_get_not_found(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         resp = await client.get(
             f"/api/v1/users/{user_id}/evidence/raw-payloads/60d5f8a0b1e2c3f4a5b6c7d8"
         )
@@ -96,9 +88,7 @@ class TestObservations:
         assert data["body"] == "Met at PyCon 2026"
         obs_id = data["id"]
 
-        get_resp = await client.get(
-            f"/api/v1/users/{user_id}/evidence/observations/{obs_id}"
-        )
+        get_resp = await client.get(f"/api/v1/users/{user_id}/evidence/observations/{obs_id}")
         assert get_resp.status_code == 200
 
     async def test_list_with_person_filter(
@@ -150,9 +140,7 @@ class TestEvidenceBundles:
         assert data["summary"] == "Known from WhatsApp group + LinkedIn"
         bundle_id = data["id"]
 
-        get_resp = await client.get(
-            f"/api/v1/users/{user_id}/evidence/bundles/{bundle_id}"
-        )
+        get_resp = await client.get(f"/api/v1/users/{user_id}/evidence/bundles/{bundle_id}")
         assert get_resp.status_code == 200
 
     async def test_list_bundles(

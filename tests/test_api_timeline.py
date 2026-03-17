@@ -20,9 +20,7 @@ async def user_id(client: AsyncClient) -> uuid.UUID:
 
 
 class TestTimeline:
-    async def test_record_and_list(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_record_and_list(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         now = datetime.now(UTC).isoformat()
         resp = await client.post(
             f"/api/v1/users/{user_id}/timeline",
@@ -43,9 +41,7 @@ class TestTimeline:
         events = list_resp.json()
         assert len(events) == 1
 
-    async def test_filter_by_event_type(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_filter_by_event_type(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         now = datetime.now(UTC).isoformat()
         await client.post(
             f"/api/v1/users/{user_id}/timeline",
@@ -74,9 +70,7 @@ class TestTimeline:
         assert len(events) == 1
         assert events[0]["event_type"] == "fact_recorded"
 
-    async def test_list_empty(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_list_empty(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         resp = await client.get(f"/api/v1/users/{user_id}/timeline")
         assert resp.status_code == 200
         assert resp.json() == []

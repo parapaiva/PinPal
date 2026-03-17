@@ -236,9 +236,7 @@ class Fact(TimestampMixin, Base):
     status: Mapped[FactStatus] = mapped_column(
         Enum(FactStatus), nullable=False, default=FactStatus.ACTIVE
     )
-    retracted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    retracted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     owner: Mapped["User"] = relationship()
     person: Mapped["Person | None"] = relationship()

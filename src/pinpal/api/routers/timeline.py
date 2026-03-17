@@ -17,9 +17,7 @@ MongoDB = Annotated[AsyncIOMotorDatabase, Depends(get_mongo_db)]  # type: ignore
 
 
 @router.post("", response_model=TimelineEventRead, status_code=201)
-async def record_event(
-    user_id: UUID, body: TimelineEventCreate, db: MongoDB
-) -> TimelineEventRead:
+async def record_event(user_id: UUID, body: TimelineEventCreate, db: MongoDB) -> TimelineEventRead:
     body.owner_user_id = str(user_id)
     repo = TimelineEventRepo(db)
     return await repo.insert(body)

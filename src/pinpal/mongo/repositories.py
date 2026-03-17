@@ -73,12 +73,7 @@ class RawPayloadRepo:
         query: dict[str, Any] = {"owner_user_id": owner_user_id}
         if source_type is not None:
             query["source_type"] = source_type
-        cursor = (
-            self._coll.find(query)
-            .sort("created_at", -1)
-            .skip(offset)
-            .limit(limit)
-        )
+        cursor = self._coll.find(query).sort("created_at", -1).skip(offset).limit(limit)
         results: list[RawPayloadRead] = []
         async for doc in cursor:
             results.append(
@@ -148,12 +143,7 @@ class ObservationRepo:
         query: dict[str, Any] = {"owner_user_id": owner_user_id}
         if person_id is not None:
             query["subject_person_id"] = person_id
-        cursor = (
-            self._coll.find(query)
-            .sort("created_at", -1)
-            .skip(offset)
-            .limit(limit)
-        )
+        cursor = self._coll.find(query).sort("created_at", -1).skip(offset).limit(limit)
         results: list[ObservationRead] = []
         async for doc in cursor:
             results.append(
@@ -226,12 +216,7 @@ class EvidenceBundleRepo:
         query: dict[str, Any] = {"owner_user_id": owner_user_id}
         if person_id is not None:
             query["person_id"] = person_id
-        cursor = (
-            self._coll.find(query)
-            .sort("created_at", -1)
-            .skip(offset)
-            .limit(limit)
-        )
+        cursor = self._coll.find(query).sort("created_at", -1).skip(offset).limit(limit)
         results: list[EvidenceBundleRead] = []
         async for doc in cursor:
             results.append(
@@ -284,12 +269,7 @@ class TimelineEventRepo:
         query: dict[str, Any] = {"owner_user_id": owner_user_id}
         if event_type is not None:
             query["event_type"] = event_type
-        cursor = (
-            self._coll.find(query)
-            .sort("occurred_at", -1)
-            .skip(offset)
-            .limit(limit)
-        )
+        cursor = self._coll.find(query).sort("occurred_at", -1).skip(offset).limit(limit)
         results: list[TimelineEventRead] = []
         async for doc in cursor:
             refs = doc.get("refs", {})

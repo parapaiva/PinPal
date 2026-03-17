@@ -97,9 +97,7 @@ class TestFactCRUD:
         assert len(facts) == 1
         assert facts[0]["fact_type"] == "manual_note"
 
-    async def test_get_fact(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_get_fact(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         create_resp = await client.post(
             f"/api/v1/users/{user_id}/facts",
             json={
@@ -114,15 +112,11 @@ class TestFactCRUD:
         assert resp.status_code == 200
         assert resp.json()["id"] == fact_id
 
-    async def test_get_fact_not_found(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_get_fact_not_found(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         resp = await client.get(f"/api/v1/users/{user_id}/facts/{uuid.uuid4()}")
         assert resp.status_code == 404
 
-    async def test_retract_fact(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_retract_fact(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         create_resp = await client.post(
             f"/api/v1/users/{user_id}/facts",
             json={
@@ -156,9 +150,7 @@ class TestFactCRUD:
         resp = await client.post(f"/api/v1/users/{user_id}/facts/{fact_id}/retract")
         assert resp.status_code == 409
 
-    async def test_update_fact(
-        self, client: AsyncClient, user_id: uuid.UUID
-    ) -> None:
+    async def test_update_fact(self, client: AsyncClient, user_id: uuid.UUID) -> None:
         create_resp = await client.post(
             f"/api/v1/users/{user_id}/facts",
             json={

@@ -82,9 +82,7 @@ async def get_fact(user_id: UUID, fact_id: UUID, session: DbSession) -> Fact:
 
 
 @router.patch("/{fact_id}", response_model=FactRead)
-async def update_fact(
-    user_id: UUID, fact_id: UUID, body: FactUpdate, session: DbSession
-) -> Fact:
+async def update_fact(user_id: UUID, fact_id: UUID, body: FactUpdate, session: DbSession) -> Fact:
     await _get_user_or_404(session, user_id)
     fact = await session.get(Fact, fact_id)
     if fact is None or fact.owner_user_id != user_id:

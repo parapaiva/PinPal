@@ -1,6 +1,7 @@
 """Shared test fixtures."""
 
 import uuid
+from datetime import UTC, datetime
 
 import pytest
 from asgi_lifespan import LifespanManager
@@ -12,11 +13,14 @@ from pinpal.api.app import create_app
 from pinpal.config import Settings
 from pinpal.db.base import Base
 from pinpal.db.enums import (
+    FactType,
     GroupType,
     RelationshipType,
     SourceType,
+    Visibility,
 )
 from pinpal.db.models import (
+    Fact,
     Group,
     Identity,
     Membership,
@@ -58,6 +62,8 @@ async def client(app) -> AsyncClient:  # type: ignore[type-arg]
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             for enum_name in [
+                "factstatus",
+                "facttype",
                 "sourcetype",
                 "visibility",
                 "sharingmode",
@@ -178,3 +184,45 @@ async def create_test_relationship(
     session.add(rel)
     await session.flush()
     return rel
+
+
+async def create_test_fact(
+    session: AsyncSession,
+    owner: User,
+    *,
+    fact_type: FactType = FactType.MANUAL_NOTE,
+    source_type: SourceType = SourceType.MANUAL,
+    person: Person | None = None,
+    confidence: float | None = None,
+    observed_at: datetime | None = None,
+    visibility: Visibility = Visibility.PRIVATE,
+    evidence_ref: str | None = None,
+) -> Fact:
+    fact = Fact(
+        owner_user_id=owner.id,
+        fact_type=fact_type,
+        source_type=source_type,
+        payload={},
+        confidence=confidence,
+        observed_at=observed_at or datetime.now(UTC),
+        visibility=visibility,
+        evidence_ref=evidence_ref,
+        person_id=person.id if person else None,
+    )
+    session.add(fact)
+    await session.flush()
+    return fact
+
+
+# ---- Mongo fixtures ----
+
+
+@pytest.fixture
+async def mongo_db(app):  # type: ignore[no-untyped-def]
+    """Provide the Motor database from the running app and clean up after test."""
+    async with LifespanManager(app) as manager:
+        db = manager.app.state.mongo_db
+        yield db
+        # Teardown: drop all test collections
+        for coll_name in await db.list_collection_names():
+            await db.drop_collection(coll_name)

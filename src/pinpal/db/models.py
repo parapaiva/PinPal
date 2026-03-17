@@ -15,11 +15,13 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from pinpal.db.base import Base
 from pinpal.db.enums import (
+    FactStatus,
+    FactType,
     GroupType,
     RelationshipStatus,
     RelationshipType,
@@ -198,3 +200,45 @@ class Relationship(TimestampMixin, Base):
 
     person_a: Mapped["Person"] = relationship(foreign_keys=[person_a_id])
     person_b: Mapped["Person"] = relationship(foreign_keys=[person_b_id])
+
+
+class Fact(TimestampMixin, Base):
+    __tablename__ = "facts"
+    __table_args__ = (
+        Index("ix_facts_owner_status", "owner_user_id", "status"),
+        Index("ix_facts_owner_fact_type", "owner_user_id", "fact_type"),
+        Index("ix_facts_person_id", "person_id"),
+        Index("ix_facts_evidence_ref", "evidence_ref"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    fact_type: Mapped[FactType] = mapped_column(Enum(FactType), nullable=False)
+    source_type: Mapped[SourceType] = mapped_column(Enum(SourceType), nullable=False)
+    payload: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)  # type: ignore[type-arg]
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    visibility: Mapped[Visibility] = mapped_column(
+        Enum(Visibility), nullable=False, default=Visibility.PRIVATE
+    )
+    evidence_ref: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    person_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("persons.id", ondelete="SET NULL"), nullable=True
+    )
+    group_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("groups.id", ondelete="SET NULL"), nullable=True
+    )
+    relationship_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("relationships.id", ondelete="SET NULL"), nullable=True
+    )
+    status: Mapped[FactStatus] = mapped_column(
+        Enum(FactStatus), nullable=False, default=FactStatus.ACTIVE
+    )
+    retracted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    owner: Mapped["User"] = relationship()
+    person: Mapped["Person | None"] = relationship()
+    group: Mapped["Group | None"] = relationship()
+    relationship_link: Mapped["Relationship | None"] = relationship()

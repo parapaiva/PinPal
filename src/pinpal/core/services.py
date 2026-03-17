@@ -9,13 +9,13 @@ from uuid import UUID
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pinpal.db.enums import RelationshipStatus
-from pinpal.db.models import Group, Identity, Membership, Person, Relationship
+from pinpal.db.enums import FactStatus, RelationshipStatus
+from pinpal.db.models import Fact, Group, Identity, Membership, Person, Relationship
 
 
 @dataclass
 class WhyReason:
-    reason_type: str  # "shared_group" | "direct_relationship" | "identity_source"
+    reason_type: str
     summary: str
     confidence: float | None = None
     group_id: UUID | None = None
@@ -23,6 +23,7 @@ class WhyReason:
     identity_id: UUID | None = None
     first_seen_at: datetime | None = None
     evidence_ref: str | None = None
+    fact_id: UUID | None = None
 
 
 @dataclass
@@ -109,6 +110,28 @@ class WhyDoIKnowService:
                     identity_id=identity.id,
                     first_seen_at=identity.created_at,
                     evidence_ref=None,
+                )
+            )
+
+        # 4. Active facts linked to this person
+        stmt_facts = select(Fact).where(
+            Fact.owner_user_id == owner_user_id,
+            Fact.person_id == person_id,
+            Fact.status == FactStatus.ACTIVE,
+        )
+        result_facts = await self._session.execute(stmt_facts)
+        for fact in result_facts.scalars().all():
+            reasons.append(
+                WhyReason(
+                    reason_type="recorded_fact",
+                    summary=(
+                        f"{fact.fact_type.value.replace('_', ' ').title()} "
+                        f"from {fact.source_type.value}"
+                    ),
+                    confidence=fact.confidence,
+                    first_seen_at=fact.observed_at,
+                    evidence_ref=fact.evidence_ref,
+                    fact_id=fact.id,
                 )
             )
 

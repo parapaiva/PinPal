@@ -7,15 +7,19 @@ from fastapi import FastAPI
 
 from pinpal.api.health import router as health_router
 from pinpal.api.routers import (
+    evidence_router,
+    facts_router,
     groups_router,
     persons_router,
     relationships_router,
+    timeline_router,
     users_router,
 )
 from pinpal.config import Settings
 from pinpal.db.session import create_engine, create_session_factory
 from pinpal.logging import setup_logging
 from pinpal.mongo.client import create_mongo_client, get_mongo_db
+from pinpal.mongo.indexes import ensure_indexes
 
 
 @asynccontextmanager
@@ -32,6 +36,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     mongo_client = create_mongo_client(settings.mongo_dsn)
     app.state.mongo_client = mongo_client
     app.state.mongo_db = get_mongo_db(mongo_client, settings.mongo_db)
+
+    await ensure_indexes(app.state.mongo_db)
 
     yield
 
@@ -55,5 +61,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(persons_router)
     app.include_router(groups_router)
     app.include_router(relationships_router)
+    app.include_router(facts_router)
+    app.include_router(evidence_router)
+    app.include_router(timeline_router)
 
     return app

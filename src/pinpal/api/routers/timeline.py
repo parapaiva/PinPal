@@ -1,6 +1,6 @@
 """Timeline event endpoints (MongoDB)."""
 
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -13,7 +13,7 @@ from pinpal.mongo.schemas import TimelineEventCreate, TimelineEventRead
 
 router = APIRouter(prefix="/api/v1/users/{user_id}/timeline", tags=["timeline"])
 
-MongoDB = Annotated[AsyncIOMotorDatabase, Depends(get_mongo_db)]  # type: ignore[type-arg]
+MongoDB = Annotated[AsyncIOMotorDatabase[dict[str, Any]], Depends(get_mongo_db)]
 
 
 @router.post("", response_model=TimelineEventRead, status_code=201)

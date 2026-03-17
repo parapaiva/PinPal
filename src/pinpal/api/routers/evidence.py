@@ -1,6 +1,6 @@
 """Evidence endpoints: raw payloads, observations, bundles (MongoDB)."""
 
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -20,7 +20,7 @@ from pinpal.mongo.schemas import (
 
 router = APIRouter(prefix="/api/v1/users/{user_id}/evidence", tags=["evidence"])
 
-MongoDB = Annotated[AsyncIOMotorDatabase, Depends(get_mongo_db)]  # type: ignore[type-arg]
+MongoDB = Annotated[AsyncIOMotorDatabase[dict[str, Any]], Depends(get_mongo_db)]
 
 
 # ---- Raw Payloads ----

@@ -227,6 +227,64 @@ class FactUpdate(BaseModel):
 # ---- WhyDoIKnow ----
 
 
+# ---- Import ----
+
+
+class WhatsAppParticipant(BaseModel):
+    display_name: str = Field(min_length=1, max_length=200)
+    phone_number: str | None = None
+    handle: str | None = None
+
+
+class WhatsAppGroupPayload(BaseModel):
+    group_name: str = Field(min_length=1, max_length=300)
+    participants: list[WhatsAppParticipant] = Field(min_length=1)
+
+
+class InstagramFollowEntry(BaseModel):
+    username: str = Field(min_length=1, max_length=200)
+    display_name: str | None = None
+
+
+class InstagramFollowsPayload(BaseModel):
+    follows: list[InstagramFollowEntry] = Field(min_length=1)
+
+
+class ManualObservationPayload(BaseModel):
+    person_display_name: str = Field(min_length=1, max_length=200)
+    person_id: UUID | None = None
+    body: str = Field(min_length=1)
+    visibility: Visibility = Visibility.PRIVATE
+
+
+class ImportRequest(BaseModel):
+    source_type: SourceType
+    payload: dict = Field(default_factory=dict)  # type: ignore[type-arg]
+
+
+class ImportEntitiesSummary(BaseModel):
+    persons: int = 0
+    identities: int = 0
+    groups: int = 0
+    memberships: int = 0
+    relationships: int = 0
+    facts: int = 0
+    observations: int = 0
+    timeline_events: int = 0
+
+
+class ImportResultRead(BaseModel):
+    import_id: UUID
+    source_type: SourceType
+    raw_payload_ref: str
+    events_produced: int
+    entities_created: ImportEntitiesSummary = Field(default_factory=ImportEntitiesSummary)
+    duplicate: bool = False
+
+
+# ---- WhyDoIKnow ----
+
+
 class WhyReasonSchema(BaseModel):
     reason_type: str
     summary: str

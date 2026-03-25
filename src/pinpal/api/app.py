@@ -10,6 +10,7 @@ from pinpal.api.routers import (
     evidence_router,
     facts_router,
     groups_router,
+    imports_router,
     persons_router,
     relationships_router,
     timeline_router,
@@ -64,5 +65,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(facts_router)
     app.include_router(evidence_router)
     app.include_router(timeline_router)
+    app.include_router(imports_router)
 
     return app

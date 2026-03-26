@@ -1,5 +1,6 @@
 """Shared test fixtures."""
 
+import socket
 import uuid
 from datetime import UTC, datetime
 
@@ -31,6 +32,19 @@ from pinpal.db.models import (
 from pinpal.db.session import create_engine, create_session_factory
 
 
+def _tcp_reachable(host: str, port: int, timeout: float = 0.5) -> bool:
+    """Return True if a TCP connection to host:port succeeds within timeout."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+_PG_AVAILABLE = _tcp_reachable("localhost", 5432)
+_MONGO_AVAILABLE = _tcp_reachable("localhost", 27017)
+
+
 @pytest.fixture
 def settings() -> Settings:
     """Return default settings (matching docker-compose)."""
@@ -46,6 +60,8 @@ def app(settings: Settings):
 @pytest.fixture
 async def client(app) -> AsyncClient:  # type: ignore[type-arg]
     """Async HTTP client wired to the FastAPI app."""
+    if not _PG_AVAILABLE or not _MONGO_AVAILABLE:
+        pytest.skip("Postgres and/or MongoDB not reachable on localhost")
     async with LifespanManager(app) as manager:
         # Create tables using the app's own engine (created by lifespan)
         engine = app.state.engine
@@ -78,6 +94,8 @@ async def client(app) -> AsyncClient:  # type: ignore[type-arg]
 @pytest.fixture
 async def db_session(settings: Settings) -> AsyncSession:  # type: ignore[misc]
     """Provide a fresh async DB session with tables created/dropped per test."""
+    if not _PG_AVAILABLE:
+        pytest.skip("Postgres not reachable on localhost:5432")
     engine = create_engine(settings.postgres_dsn)
 
     async with engine.begin() as conn:
@@ -220,6 +238,8 @@ async def create_test_fact(
 @pytest.fixture
 async def mongo_db(app):  # type: ignore[no-untyped-def]
     """Provide the Motor database from the running app and clean up after test."""
+    if not _MONGO_AVAILABLE:
+        pytest.skip("MongoDB not reachable on localhost:27017")
     async with LifespanManager(app) as manager:
         db = manager.app.state.mongo_db
         yield db

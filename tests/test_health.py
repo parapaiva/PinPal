@@ -3,6 +3,8 @@
 import pytest
 from httpx import AsyncClient
 
+pytestmark = pytest.mark.integration
+
 
 async def test_healthz_returns_200(client: AsyncClient) -> None:
     """Endpoint is wired and returns 200 (may be degraded without Docker)."""
@@ -14,7 +16,6 @@ async def test_healthz_returns_200(client: AsyncClient) -> None:
     assert "mongo" in body["checks"]
 
 
-@pytest.mark.integration
 async def test_healthz_all_ok(client: AsyncClient) -> None:
     """With Docker services running, both checks should pass."""
     resp = await client.get("/healthz")

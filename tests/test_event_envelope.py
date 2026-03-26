@@ -85,9 +85,7 @@ class TestWhatsAppSchemas:
 
     def test_missing_group_name_rejected(self) -> None:
         with pytest.raises(ValidationError):
-            WhatsAppGroupPayload(
-                participants=[WhatsAppParticipant(display_name="Alice")]
-            )
+            WhatsAppGroupPayload(participants=[WhatsAppParticipant(display_name="Alice")])
 
     def test_participant_optional_fields(self) -> None:
         p = WhatsAppParticipant(display_name="Bob")
@@ -97,9 +95,7 @@ class TestWhatsAppSchemas:
 
 class TestInstagramSchemas:
     def test_valid_instagram_payload(self) -> None:
-        payload = InstagramFollowsPayload(
-            follows=[InstagramFollowEntry(username="alice_ig")]
-        )
+        payload = InstagramFollowsPayload(follows=[InstagramFollowEntry(username="alice_ig")])
         assert len(payload.follows) == 1
 
     def test_empty_follows_rejected(self) -> None:

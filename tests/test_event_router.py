@@ -60,9 +60,7 @@ class TestEventRouter:
         result = await router.dispatch_all([event], ctx)
         assert result is ctx
 
-    async def test_dispatch_order_preserved(
-        self, session: AsyncMock, mongo_db: MagicMock
-    ) -> None:
+    async def test_dispatch_order_preserved(self, session: AsyncMock, mongo_db: MagicMock) -> None:
         router = EventRouter(session, mongo_db)
         call_order: list[str] = []
 
